@@ -1,0 +1,52 @@
+[project]
+name = "autopilot-pmo-ai"
+version = "1.0.0"
+description = "AutoPilot PMO AI - autonomous, governed PMO operations agent (POC). Developed and Built by Oren Salami - V1.0"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{ name = "Oren Salami" }]
+dependencies = [
+    "fastapi>=0.162,<1",
+    "uvicorn>=0.54,<1",
+    "httpx>=0.28,<1",
+    "jinja2>=3.1.6,<4",
+    "python-multipart>=0.0.33",
+    "playwright>=1.64,<2",
+    "anthropic>=2.6,<3",
+]
+
+[project.optional-dependencies]
+ui = ["streamlit>=1.67,<2"]
+dev = [
+    "pytest>=9.2,<10",
+    "pytest-timeout>=2.4",
+    "ruff>=0.17,<1",
+    "pip-audit>=2.10",
+]
+
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.ruff]
+line-length = 130
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "BLE"]
+ignore = ["S101", "S311", "S603", "S607", "B008", "E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S", "BLE"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+timeout = 180
+markers = [
+    "browser: needs Playwright Chromium installed",
+    "docker: runs against the running Docker Compose stack (set E2E_BASE_URL)",
+]
+addopts = "-ra"

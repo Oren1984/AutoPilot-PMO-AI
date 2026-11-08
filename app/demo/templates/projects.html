@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Projects · DemoCorp{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Project Portfolio</h1>
+  <table id="projects">
+    <tr><th>ID</th><th>Name</th><th>Status</th><th>Owner</th><th>Health</th><th>End date</th></tr>
+    {% for p in projects %}
+    <tr>
+      <td><a href="/ui/projects/{{ p.id }}">{{ p.id }}</a></td><td>{{ p.name }}</td><td>{{ p.status }}</td>
+      <td>{{ p.owner }}</td><td><span class="badge s-{{ p.health|replace(' ', '-') }}">{{ p.health }}</span></td><td>{{ p.end_date }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

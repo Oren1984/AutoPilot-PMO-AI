@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}DemoCorp Enterprise Suite{% endblock %}</title>
+<style>
+  :root { --ink:#1d2433; --muted:#5b6578; --line:#d9dee7; --bg:#f4f6f9; --brand:#0b5cad; --ok:#1f7a3a; --warn:#a15c00; --bad:#b42318; }
+  * { box-sizing: border-box; }
+  body { margin:0; font: 14px/1.45 "Segoe UI", system-ui, sans-serif; color:var(--ink); background:var(--bg); }
+  header { background:#12263f; color:#fff; padding:10px 20px; display:flex; align-items:center; gap:16px; }
+  header .logo { font-weight:700; letter-spacing:.3px; }
+  header nav a { color:#cfe0f5; text-decoration:none; margin-right:14px; }
+  header .user { margin-left:auto; font-size:12px; color:#cfe0f5; }
+  .sim { background:#fff4d6; color:#6b4a00; text-align:center; font-size:12px; padding:4px; border-bottom:1px solid #f0d58a; }
+  main { max-width:1100px; margin:18px auto; padding:0 16px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:8px; padding:16px; margin-bottom:16px; }
+  h1 { font-size:22px; margin:0 0 6px; } h2 { font-size:16px; margin:0 0 10px; }
+  table { width:100%; border-collapse:collapse; } th, td { text-align:left; padding:7px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
+  .badge { display:inline-block; padding:1px 8px; border-radius:10px; font-size:12px; border:1px solid var(--line); background:#f7f8fa; }
+  .s-At-Risk, .s-Amber, .s-Pending-Approval { background:#fff1db; border-color:#f3c47a; color:var(--warn); }
+  .s-Blocked, .s-Red, .s-Off-Track { background:#fde8e6; border-color:#f3a59c; color:var(--bad); }
+  .s-Done, .s-Green, .s-On-Track, .s-Paid, .s-paid { background:#e6f4ea; border-color:#9ccfab; color:var(--ok); }
+  .meta { color:var(--muted); font-size:13px; }
+  .btn { display:inline-block; background:var(--brand); color:#fff; border:0; border-radius:6px; padding:8px 14px; font-size:14px; text-decoration:none; cursor:pointer; }
+  label { display:block; font-weight:600; margin:10px 0 4px; }
+  select, textarea, input[type=password], input[type=text] { width:100%; padding:8px; border:1px solid var(--line); border-radius:6px; font: inherit; }
+  textarea { min-height:160px; }
+  .flash { background:#e6f4ea; border:1px solid #9ccfab; color:var(--ok); padding:8px 12px; border-radius:6px; margin-bottom:12px; }
+  .error { background:#fde8e6; border:1px solid #f3a59c; color:var(--bad); padding:8px 12px; border-radius:6px; margin-bottom:12px; }
+  .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; }
+  .kpi { border:1px solid var(--line); border-radius:6px; padding:10px; } .kpi b { display:block; font-size:18px; }
+  pre.desc { white-space:pre-wrap; font: inherit; margin:0; color:var(--muted); font-size:12px; }
+</style>
+</head>
+<body>
+<header>
+  <span class="logo">DemoCorp Enterprise Suite</span>
+  <nav><a href="/ui/">Projects</a></nav>
+  <span class="user">{% if user %}Signed in: {{ user }}{% else %}Not signed in{% endif %}</span>
+</header>
+<div class="sim">SIMULATED ENTERPRISE APPLICATION — local demo data only. Payments are simulated; no funds move.</div>
+<main>
+{% block content %}{% endblock %}
+</main>
+</body>
+</html>

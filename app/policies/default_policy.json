@@ -1,0 +1,55 @@
+{
+  "version": "1.0",
+  "description": "AutoPilot PMO AI governance policy. Loaded read-only at startup; the agent has no tool to read-modify-write it.",
+  "default_decision": "prohibited",
+  "financial": {
+    "hard_limit_per_action": 100000,
+    "allowed_currencies": ["USD", "EUR", "ILS"],
+    "allowed_methods": ["api"]
+  },
+  "actions": {
+    "list_projects":            {"level": "autonomous", "methods": ["api"]},
+    "get_project":              {"level": "autonomous", "methods": ["api"]},
+    "list_tasks":               {"level": "autonomous", "methods": ["api"]},
+    "list_milestones":          {"level": "autonomous", "methods": ["api"]},
+    "list_purchase_requests":   {"level": "autonomous", "methods": ["api"]},
+    "get_purchase_request":     {"level": "autonomous", "methods": ["api"]},
+    "list_status_reports":      {"level": "autonomous", "methods": ["api"]},
+    "ui_view_project":          {"level": "autonomous", "methods": ["ui"]},
+    "update_task_status": {
+      "level": "autonomous",
+      "methods": ["api"],
+      "allowed_values": {"status": ["In Progress", "At Risk", "Blocked"]},
+      "approval_values": {"status": ["Cancelled"]}
+    },
+    "add_task_comment": {
+      "level": "autonomous",
+      "methods": ["api"],
+      "max_length": {"body": 2000}
+    },
+    "update_milestone_health": {
+      "level": "autonomous",
+      "methods": ["api"],
+      "allowed_values": {"health": ["On Track", "At Risk"]},
+      "approval_values": {"health": ["Off Track"]}
+    },
+    "ui_submit_status_report": {
+      "level": "autonomous",
+      "methods": ["ui"],
+      "allowed_values": {"rag": ["Green", "Amber", "Red"]},
+      "max_length": {"summary": 4000}
+    },
+    "execute_payment": {
+      "level": "approval_required",
+      "methods": ["api"],
+      "financial": true
+    },
+    "increase_budget": {
+      "level": "approval_required",
+      "methods": ["api"],
+      "financial": true
+    },
+    "change_user_role":  {"level": "prohibited", "methods": []},
+    "delete_record":     {"level": "prohibited", "methods": []}
+  }
+}

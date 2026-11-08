@@ -1,0 +1,112 @@
+# AutoPilot PMO AI - one Compose project, three services.
+#   docker compose up --build -d
+# Console:  http://localhost:8501   Backend API: http://localhost:8000/docs   Demo enterprise app: http://localhost:8100
+# All ports bind to 127.0.0.1 only. Values come from .env (see .env.example); demo defaults are NOT secrets.
+name: autopilot-pmo-ai
+
+x-service: &service
+  image: autopilot-pmo-ai:1.0.0
+  restart: unless-stopped
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  init: true
+  logging:
+    driver: json-file
+    options: { max-size: "10m", max-file: "3" }
+
+services:
+  enterprise:
+    <<: *service
+    build: .
+    command: ["uvicorn", "app.demo.enterprise_app:app_factory", "--factory", "--host", "0.0.0.0", "--port", "8100"]
+    environment:
+      ENTERPRISE_DB_PATH: /data/enterprise.db
+      ENTERPRISE_API_TOKEN: ${ENTERPRISE_API_TOKEN:-demo-service-token-change-me}
+      ENTERPRISE_ADMIN_TOKEN: ${ENTERPRISE_ADMIN_TOKEN:-demo-admin-token-change-me}
+    volumes:
+      - enterprise-data:/data
+    ports:
+      - "127.0.0.1:${ENTERPRISE_PORT:-8100}:8100"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8100/api/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+    deploy:
+      resources:
+        limits: { cpus: "0.50", memory: 256M }
+
+  backend:
+    <<: *service
+    command: ["uvicorn", "app.api.main:app_factory", "--factory", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      APP_MODE: ${APP_MODE:-demo}
+      AGENT_BRAIN: ${AGENT_BRAIN:-}
+      ENTERPRISE_TARGET: ${ENTERPRISE_TARGET:-}
+      DATA_DIR: /data
+      ENTERPRISE_BASE_URL: http://enterprise:8100
+      ENTERPRISE_API_TOKEN: ${ENTERPRISE_API_TOKEN:-demo-service-token-change-me}
+      APPROVER_API_KEY: ${APPROVER_API_KEY:-demo-approver-key-change-me}
+      APPROVAL_TTL_MINUTES: ${APPROVAL_TTL_MINUTES:-30}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      CLAUDE_MODEL: ${CLAUDE_MODEL:-claude-opus-5-5}
+      CLAUDE_EFFORT: ${CLAUDE_EFFORT:-medium}
+      MODEL_PRICE_INPUT_PER_MTOK: ${MODEL_PRICE_INPUT_PER_MTOK:-}
+      MODEL_PRICE_OUTPUT_PER_MTOK: ${MODEL_PRICE_OUTPUT_PER_MTOK:-}
+      SALESFORCE_INSTANCE_URL: ${SALESFORCE_INSTANCE_URL:-}
+      SALESFORCE_CLIENT_ID: ${SALESFORCE_CLIENT_ID:-}
+      SALESFORCE_CLIENT_SECRET: ${SALESFORCE_CLIENT_SECRET:-}
+      MAX_STEPS: ${MAX_STEPS:-40}
+      MAX_TOOL_CALLS: ${MAX_TOOL_CALLS:-60}
+      MAX_MODEL_CALLS: ${MAX_MODEL_CALLS:-25}
+      MAX_COST_USD: ${MAX_COST_USD:-2.0}
+      RUN_TIMEOUT_SECONDS: ${RUN_TIMEOUT_SECONDS:-900}
+      AUDIT_RETENTION_DAYS: ${AUDIT_RETENTION_DAYS:-30}
+    volumes:
+      - agent-data:/data
+    ports:
+      - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
+    shm_size: 512m
+    depends_on:
+      enterprise:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+    deploy:
+      resources:
+        limits: { cpus: "1.50", memory: 1536M }
+
+  ui:
+    <<: *service
+    command: ["streamlit", "run", "ui/streamlit_app.py", "--server.address", "0.0.0.0", "--server.port", "8501", "--server.headless", "true", "--browser.gatherUsageStats", "false"]
+    environment:
+      BACKEND_URL: http://backend:8000
+      ENTERPRISE_BASE_URL: http://enterprise:8100
+      ENTERPRISE_PUBLIC_URL: http://localhost:${ENTERPRISE_PORT:-8100}
+      APPROVER_API_KEY: ${APPROVER_API_KEY:-demo-approver-key-change-me}
+      ENTERPRISE_ADMIN_TOKEN: ${ENTERPRISE_ADMIN_TOKEN:-demo-admin-token-change-me}
+    ports:
+      - "127.0.0.1:${UI_PORT:-8501}:8501"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8501/_stcore/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+    deploy:
+      resources:
+        limits: { cpus: "0.75", memory: 768M }
+
+volumes:
+  agent-data:
+  enterprise-data:

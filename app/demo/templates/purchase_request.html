@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{{ pr.id }} · DemoCorp{% endblock %}
+{% block content %}
+<div class="card" style="max-width:760px">
+  <h1>{{ pr.id }} — {{ pr.title }}</h1>
+  <div class="meta">Project <a href="/ui/projects/{{ project.id }}">{{ project.id }}</a> · requested by {{ pr.requested_by }}</div>
+  <table style="margin-top:10px">
+    <tr><th>Vendor</th><td>{{ pr.vendor }}</td></tr>
+    <tr><th>Recipient account</th><td data-sensitive>{{ pr.recipient_account_masked }}</td></tr>
+    <tr><th>Amount</th><td>{{ "{:,.2f}".format(pr.amount) }} {{ pr.currency }}</td></tr>
+    <tr><th>Status</th><td><span class="badge s-{{ pr.status.split(' ')[0] }}">{{ pr.status }}</span></td></tr>
+    <tr><th>Justification</th><td>{{ pr.justification }}</td></tr>
+  </table>
+  <p class="meta">Payments are executed only through the governed approval workflow (API with human approval). This screen has no payment control.</p>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}{{ project.id }} · DemoCorp{% endblock %}
+{% block content %}
+{% if flash %}<div class="flash" id="flash">{{ flash }}</div>{% endif %}
+<div class="card">
+  <h1 id="project-title">{{ project.id }} — {{ project.name }}</h1>
+  <div class="meta">Owner {{ project.owner }} · {{ project.start_date }} → {{ project.end_date }} · Status {{ project.status }}</div>
+  <div class="grid" style="margin-top:12px">
+    <div class="kpi">Budget<b>{{ "{:,.0f}".format(project.budget_total) }} {{ project.currency }}</b></div>
+    <div class="kpi">Committed<b>{{ "{:,.0f}".format(project.budget_committed) }} {{ project.currency }}</b></div>
+    <div class="kpi">Remaining<b>{{ "{:,.0f}".format(project.budget_total - project.budget_committed) }} {{ project.currency }}</b></div>
+    <div class="kpi">Health<b><span class="badge s-{{ project.health|replace(' ', '-') }}">{{ project.health }}</span></b></div>
+  </div>
+</div>
+<div class="card">
+  <h2>Tasks</h2>
+  <table id="tasks">
+    <tr><th>ID</th><th>Task</th><th>Owner</th><th>Due</th><th>Status</th></tr>
+    {% for t in tasks %}
+    <tr data-task="{{ t.id }}">
+      <td>{{ t.id }}</td><td>{{ t.title }}<pre class="desc">{{ t.description }}</pre></td><td>{{ t.owner }}</td>
+      <td>{{ t.due_date }}</td><td><span class="badge s-{{ t.status|replace(' ', '-') }}">{{ t.status }}</span></td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+<div class="card">
+  <h2>Milestones</h2>
+  <table id="milestones">
+    <tr><th>ID</th><th>Milestone</th><th>Due</th><th>Status</th><th>Health</th></tr>
+    {% for m in milestones %}
+    <tr><td>{{ m.id }}</td><td>{{ m.name }}</td><td>{{ m.due_date }}</td><td>{{ m.status }}</td>
+      <td><span class="badge s-{{ m.health|replace(' ', '-') }}">{{ m.health }}</span></td></tr>
+    {% endfor %}
+  </table>
+</div>
+<div class="card">
+  <h2>Purchase requests</h2>
+  <table id="purchase-requests">
+    <tr><th>ID</th><th>Title</th><th>Vendor</th><th>Amount</th><th>Status</th></tr>
+    {% for pr in prs %}
+    <tr><td><a href="/ui/purchase-requests/{{ pr.id }}">{{ pr.id }}</a></td><td>{{ pr.title }}</td><td>{{ pr.vendor }}</td>
+      <td>{{ "{:,.2f}".format(pr.amount) }} {{ pr.currency }}</td><td><span class="badge s-{{ pr.status.split(' ')[0] }}">{{ pr.status }}</span></td></tr>
+    {% endfor %}
+  </table>
+</div>
+<div class="card">
+  <h2>Weekly status reports</h2>
+  <p><a class="btn" id="new-status-report" href="/ui/projects/{{ project.id }}/status-report/new">New status report</a></p>
+  <table id="status-reports">
+    <tr><th>ID</th><th>RAG</th><th>Summary</th><th>Author</th><th>Submitted</th></tr>
+    {% for r in reports %}
+    <tr><td>{{ r.id }}</td><td><span class="badge s-{{ r.rag }}">{{ r.rag }}</span></td><td><pre class="desc">{{ r.summary }}</pre></td><td>{{ r.author }}</td><td>{{ r.created_at }}</td></tr>
+    {% else %}
+    <tr><td colspan="5" class="meta">No status reports yet.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

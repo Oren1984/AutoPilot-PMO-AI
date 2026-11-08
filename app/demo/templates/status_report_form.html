@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}New status report · DemoCorp{% endblock %}
+{% block content %}
+<div class="card" style="max-width:760px">
+  <h1>New weekly status report</h1>
+  <div class="meta">{{ project.id }} — {{ project.name }}</div>
+  {% if error %}<div class="error">{{ error }}</div>{% endif %}
+  <form method="post" action="/ui/projects/{{ project.id }}/status-report" id="status-report-form">
+    <label for="rag">Overall RAG status</label>
+    <select id="rag" name="rag">
+      <option value="">— select —</option><option>Green</option><option>Amber</option><option>Red</option>
+    </select>
+    <label for="summary">Summary</label>
+    <textarea id="summary" name="summary"></textarea>
+    <p><button class="btn" id="submit-report" type="submit">Submit report</button></p>
+  </form>
+</div>
+{% endblock %}
