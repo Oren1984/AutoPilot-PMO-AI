@@ -57,7 +57,8 @@ jobs:
           E2E_RESTART: "1"
         run: |
           pip install pytest pytest-timeout httpx
-          pytest tests/e2e -m docker -q -p no:cacheprovider --rootdir tests/e2e -c /dev/null
+          # --confcutdir keeps pytest from loading tests/conftest.py, which needs the full app dependencies
+          pytest tests/e2e -m docker -q -p no:cacheprovider --rootdir tests/e2e --confcutdir tests/e2e -c /dev/null
       - name: Compose logs
         if: failure()
         run: docker compose logs --tail 200
